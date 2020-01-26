@@ -1,0 +1,23 @@
+version = "0.0.1-SNAPSHOT"
+sourceCompatibility = 11
+
+dependencyManagement {
+  imports {
+    mavenBom "org.springframework.boot:spring-boot-dependencies:${springBootVersion}"
+  }
+}
+
+dependencies {
+  testImplementation("org.junit.jupiter:junit-jupiter-api")
+  testImplementation("org.junit.jupiter:junit-jupiter-params")
+  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+  testImplementation("org.assertj:assertj-core")
+}
+
+test {
+  useJUnitPlatform()
+
+  testLogging {
+    events "passed", "skipped", "failed"
+  }
+}
