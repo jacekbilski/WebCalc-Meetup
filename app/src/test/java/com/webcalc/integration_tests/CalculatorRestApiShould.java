@@ -55,6 +55,19 @@ class CalculatorRestApiShould {
         .statusCode(401);
   }
 
+  @Test
+  void canDefineAndExecuteCustomFunction() {
+    given()
+        .auth().preemptive().basic(DEFAULT_USERNAME, DEFAULT_PASSWORD)
+        .body("e 2,7182818284590452354")
+    .when()
+        .put("/define")
+    .then()
+        .statusCode(200);
+
+    assertEvalResult("e", "2,72");
+  }
+
   private void setMaxFractionDigitsForSession(int maxFractionDigits, SessionFilter session) {
     given()
         .filter(session)

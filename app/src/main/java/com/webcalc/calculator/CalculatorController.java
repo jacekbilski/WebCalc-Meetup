@@ -31,6 +31,10 @@ public class CalculatorController {
     return calculator.eval(user.id, body, (Integer) session.getAttribute(MAX_FRACTION_DIGITS));
   }
 
+  @PutMapping("/define")
+  public void defineCustomFunction() {
+  }
+
   @PutMapping("/maxFractionDigits")
   public void setMaxFractionDigits(@RequestBody String body, HttpSession session) {
     session.setAttribute(MAX_FRACTION_DIGITS, Integer.parseInt(body));
