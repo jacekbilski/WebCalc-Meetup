@@ -78,7 +78,8 @@ public class Calculator {
   }
 
   public void defineCustomFunction(String definition) {
-    customFunction = stack -> BigDecimal.valueOf(Math.E);
+    String[] tokens = definition.trim().split(" ");
+    customFunction = stack -> parse(tokens[1]);
   }
 
   private BigDecimal parse(String string) {

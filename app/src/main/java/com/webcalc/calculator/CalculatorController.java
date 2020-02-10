@@ -32,8 +32,8 @@ public class CalculatorController {
   }
 
   @PutMapping("/define")
-  public void defineCustomFunction() {
-    calculator.defineCustomFunction("");
+  public void defineCustomFunction(@RequestBody String body) {
+    calculator.defineCustomFunction(body);
   }
 
   @PutMapping("/maxFractionDigits")
