@@ -64,6 +64,8 @@ public class Calculator {
           var b = stack.pop();
           return BigDecimal.valueOf(Math.pow(b.doubleValue(), a.doubleValue()));
         };
+      case "^2":
+        return stack -> stack.pop().pow(2);
       default:
         throw new RuntimeException("Unsupported function: " + function);
     }

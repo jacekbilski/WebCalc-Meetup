@@ -83,6 +83,18 @@ class CalculatorShould {
     assertThat(result).isEqualTo(expectedResult);
   }
 
+  @DisplayName("Square")
+  @ParameterizedTest(name = "input: ''{0}'', expected result: ''{1}''")
+  @CsvSource({
+      "0 ^2, 0",
+      "2 ^2, 4",
+      "3 ^2, 9",
+  })
+  void square(String input, String expectedResult) {
+    String result = calculator.eval(userId, input, Calculator.DEFAULT_MAX_FRACTION_DIGITS);
+    assertThat(result).isEqualTo(expectedResult);
+  }
+
   @DisplayName("Complex calculations")
   @ParameterizedTest(name = "input: ''{0}'', expected result: ''{1}''")
   @CsvSource({
