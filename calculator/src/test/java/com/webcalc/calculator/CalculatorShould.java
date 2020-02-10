@@ -71,6 +71,18 @@ class CalculatorShould {
     assertThat(result).isEqualTo(expectedResult);
   }
 
+  @DisplayName("Power")
+  @ParameterizedTest(name = "input: ''{0}'', expected result: ''{1}''")
+  @CsvSource({
+      "2 3 ^, 8",
+      "3 0 ^, 1",
+      "15 1 ^, 15",
+  })
+  void power(String input, String expectedResult) {
+    String result = calculator.eval(userId, input, Calculator.DEFAULT_MAX_FRACTION_DIGITS);
+    assertThat(result).isEqualTo(expectedResult);
+  }
+
   @DisplayName("Complex calculations")
   @ParameterizedTest(name = "input: ''{0}'', expected result: ''{1}''")
   @CsvSource({

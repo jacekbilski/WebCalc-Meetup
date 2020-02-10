@@ -53,6 +53,8 @@ public class Calculator {
         return BigDecimal::multiply;
       case "/":
         return (v1, v2) -> v1.divide(v2, maxFractionDigits, RoundingMode.HALF_UP);
+      case "^":
+        return (v1, v2) -> BigDecimal.valueOf(Math.pow(v1.doubleValue(), v2.doubleValue()));
       default:
         throw new RuntimeException("Unsupported function: " + function);
     }
