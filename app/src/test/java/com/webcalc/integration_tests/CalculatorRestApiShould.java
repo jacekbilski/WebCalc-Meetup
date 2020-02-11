@@ -59,13 +59,13 @@ class CalculatorRestApiShould {
   void canDefineAndExecuteCustomFunction() {
     given()
         .auth().preemptive().basic(DEFAULT_USERNAME, DEFAULT_PASSWORD)
-        .body("e 2,7182818284590452354")
+        .body("times2 2 *")
     .when()
         .put("/define")
     .then()
         .statusCode(200);
 
-    assertEvalResult("e", "2,72");
+    assertEvalResult("3 times2", "6");
   }
 
   private void setMaxFractionDigitsForSession(int maxFractionDigits, SessionFilter session) {
