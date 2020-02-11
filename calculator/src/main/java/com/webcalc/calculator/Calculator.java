@@ -20,7 +20,7 @@ public class Calculator {
 
   private CalculatorObserver observer;
 
-  private Map<String, Function<Stack<BigDecimal>, BigDecimal>> customFunctions = new HashMap<>();
+  private Map<String, Function<EvaluationContext, BigDecimal>> customFunctions = new HashMap<>();
 
   public Calculator() {
     formatter = DecimalFormat.getNumberInstance(Locale.GERMANY);
@@ -30,53 +30,53 @@ public class Calculator {
 
   public String eval(UUID userId, String input, int maxFractionDigits) {
     String[] tokens = input.trim().split(" ");
-    var stack = new Stack<BigDecimal>();
-    var result = eval(userId, stack, tokens, maxFractionDigits);
+    var ctx = new EvaluationContext(new Stack<>());
+    var result = eval(userId, ctx, tokens, maxFractionDigits);
     return format(result, maxFractionDigits);
   }
 
-  private BigDecimal eval(UUID userId, Stack<BigDecimal> stack, String[] tokens, int maxFractionDigits) {
+  private BigDecimal eval(UUID userId, EvaluationContext ctx, String[] tokens, int maxFractionDigits) {
     for (String token : tokens) {
       try {
         var value = parse(token);
-        stack.push(value);
+        ctx.stack.push(value);
       } catch (Exception e) {
         var f = function(token, maxFractionDigits);
-        stack.push(f.apply(stack));
+        ctx.stack.push(f.apply(ctx));
         if (observer != null)
           observer.evaluated(userId, token);
       }
     }
-    return stack.pop();
+    return ctx.stack.pop();
   }
 
-  private Function<Stack<BigDecimal>, BigDecimal> function(String function, int maxFractionDigits) {
+  private Function<EvaluationContext, BigDecimal> function(String function, int maxFractionDigits) {
     switch (function) {
       case "+":
-        return stack -> stack.pop().add(stack.pop());
+        return ctx -> ctx.stack.pop().add(ctx.stack.pop());
       case "-":
-        return stack -> {
-          BigDecimal a = stack.pop();
-          BigDecimal b = stack.pop();
+        return ctx -> {
+          BigDecimal a = ctx.stack.pop();
+          BigDecimal b = ctx.stack.pop();
           return b.subtract(a);};
       case "*":
-        return stack -> stack.pop().multiply(stack.pop());
+        return ctx -> ctx.stack.pop().multiply(ctx.stack.pop());
       case "/":
-        return stack -> {
-          var a = stack.pop();
-          var b = stack.pop();
+        return ctx -> {
+          var a = ctx.stack.pop();
+          var b = ctx.stack.pop();
           return b.divide(a, maxFractionDigits, RoundingMode.HALF_UP);
         };
       case "^":
-        return stack -> {
-          var a = stack.pop();
-          var b = stack.pop();
+        return ctx -> {
+          var a = ctx.stack.pop();
+          var b = ctx.stack.pop();
           return BigDecimal.valueOf(Math.pow(b.doubleValue(), a.doubleValue()));
         };
       case "^2":
-        return stack -> stack.pop().pow(2);
+        return ctx -> ctx.stack.pop().pow(2);
       case "π":
-        return stack -> BigDecimal.valueOf(Math.PI);
+        return ctx -> BigDecimal.valueOf(Math.PI);
       default:
         if (customFunctions.containsKey(function))
           return customFunctions.get(function);
@@ -88,14 +88,14 @@ public class Calculator {
   public void defineCustomFunction(String definition) {
     String[] tokens = definition.trim().split(" ");
     if (tokens[0].equals("e")) {
-      customFunctions.put(tokens[0], stack -> parse(tokens[1]));
+      customFunctions.put(tokens[0], ctx -> parse(tokens[1]));
     } else {
       // "2 *"
-      customFunctions.put(tokens[0], stack -> {
+      customFunctions.put(tokens[0], ctx -> {
         var value = parse(tokens[1]);
-        stack.push(value);
+        ctx.stack.push(value);
         var f = function(tokens[2], DEFAULT_MAX_FRACTION_DIGITS);
-        return f.apply(stack);
+        return f.apply(ctx);
       });
     }
   }
@@ -116,5 +116,13 @@ public class Calculator {
 
   public void addObserver(CalculatorObserver observer) {
     this.observer = observer;
+  }
+
+  private static class EvaluationContext {
+    public final Stack<BigDecimal> stack;
+
+    public EvaluationContext(Stack<BigDecimal> stack) {
+      this.stack = stack;
+    }
   }
 }
