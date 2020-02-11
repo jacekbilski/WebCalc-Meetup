@@ -5,7 +5,9 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Stack;
 import java.util.UUID;
 import java.util.function.Function;
@@ -18,7 +20,7 @@ public class Calculator {
 
   private CalculatorObserver observer;
 
-  private Function<Stack<BigDecimal>, BigDecimal> customFunction;
+  private Map<String, Function<Stack<BigDecimal>, BigDecimal>> customFunctions = new HashMap<>();
 
   public Calculator() {
     formatter = DecimalFormat.getNumberInstance(Locale.GERMANY);
@@ -70,16 +72,17 @@ public class Calculator {
         return stack -> stack.pop().pow(2);
       case "π":
         return stack -> BigDecimal.valueOf(Math.PI);
-      case "e":
-        return customFunction;
       default:
-        throw new RuntimeException("Unsupported function: " + function);
+        if (customFunctions.containsKey(function))
+          return customFunctions.get(function);
+        else
+          throw new RuntimeException("Unsupported function: " + function);
     }
   }
 
   public void defineCustomFunction(String definition) {
     String[] tokens = definition.trim().split(" ");
-    customFunction = stack -> parse(tokens[1]);
+    customFunctions.put(tokens[0], stack -> parse(tokens[1]));
   }
 
   private BigDecimal parse(String string) {
