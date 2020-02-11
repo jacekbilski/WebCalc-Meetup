@@ -36,7 +36,7 @@ public class Calculator {
         var value = parse(token);
         stack.push(value);
       } catch (Exception e) {
-        Function<Stack<BigDecimal>, BigDecimal> f = function(token, maxFractionDigits);
+        var f = function(token, maxFractionDigits);
         stack.push(f.apply(stack));
         if (observer != null)
           observer.evaluated(userId, token);
@@ -87,7 +87,8 @@ public class Calculator {
     } else {
       // "2 *"
       customFunctions.put(tokens[0], stack -> {
-        stack.push(parse(tokens[1]));
+        var value = parse(tokens[1]);
+        stack.push(value);
         var f = function(tokens[2], DEFAULT_MAX_FRACTION_DIGITS);
         return f.apply(stack);
       });
