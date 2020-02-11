@@ -30,27 +30,27 @@ public class Calculator {
 
   public String eval(UUID userId, String input, int maxFractionDigits) {
     String[] tokens = input.trim().split(" ");
-    var ctx = new EvaluationContext(new Stack<>());
-    var result = eval(userId, ctx, tokens, maxFractionDigits);
+    var ctx = new EvaluationContext(new Stack<>(), userId, maxFractionDigits);
+    var result = eval(ctx, tokens);
     return format(result, maxFractionDigits);
   }
 
-  private BigDecimal eval(UUID userId, EvaluationContext ctx, String[] tokens, int maxFractionDigits) {
+  private BigDecimal eval(EvaluationContext ctx, String[] tokens) {
     for (String token : tokens) {
       try {
         var value = parse(token);
         ctx.stack.push(value);
       } catch (Exception e) {
-        var f = function(token, maxFractionDigits);
+        var f = function(token);
         ctx.stack.push(f.apply(ctx));
         if (observer != null)
-          observer.evaluated(userId, token);
+          observer.evaluated(ctx.userId, token);
       }
     }
     return ctx.stack.pop();
   }
 
-  private Function<EvaluationContext, BigDecimal> function(String function, int maxFractionDigits) {
+  private Function<EvaluationContext, BigDecimal> function(String function) {
     switch (function) {
       case "+":
         return ctx -> ctx.stack.pop().add(ctx.stack.pop());
@@ -65,7 +65,7 @@ public class Calculator {
         return ctx -> {
           var a = ctx.stack.pop();
           var b = ctx.stack.pop();
-          return b.divide(a, maxFractionDigits, RoundingMode.HALF_UP);
+          return b.divide(a, ctx.maxFractionDigits, RoundingMode.HALF_UP);
         };
       case "^":
         return ctx -> {
@@ -94,7 +94,7 @@ public class Calculator {
       customFunctions.put(tokens[0], ctx -> {
         var value = parse(tokens[1]);
         ctx.stack.push(value);
-        var f = function(tokens[2], DEFAULT_MAX_FRACTION_DIGITS);
+        var f = function(tokens[2]);
         return f.apply(ctx);
       });
     }
@@ -120,9 +120,13 @@ public class Calculator {
 
   private static class EvaluationContext {
     public final Stack<BigDecimal> stack;
+    public final UUID userId;
+    public final int maxFractionDigits;
 
-    public EvaluationContext(Stack<BigDecimal> stack) {
+    public EvaluationContext(Stack<BigDecimal> stack, UUID userId, int maxFractionDigits) {
       this.stack = stack;
+      this.userId = userId;
+      this.maxFractionDigits = maxFractionDigits;
     }
   }
 }
