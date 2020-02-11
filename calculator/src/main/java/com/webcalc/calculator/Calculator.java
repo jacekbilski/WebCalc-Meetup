@@ -85,7 +85,12 @@ public class Calculator {
     if (tokens[0].equals("e")) {
       customFunctions.put(tokens[0], stack -> parse(tokens[1]));
     } else {
-      customFunctions.put(tokens[0], stack -> parse("6"));
+      // "2 *"
+      customFunctions.put(tokens[0], stack -> {
+        stack.push(parse(tokens[1]));
+        var f = function(tokens[2], DEFAULT_MAX_FRACTION_DIGITS);
+        return f.apply(stack);
+      });
     }
   }
 
