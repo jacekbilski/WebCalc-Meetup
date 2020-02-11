@@ -5,6 +5,7 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -87,17 +88,7 @@ public class Calculator {
 
   public void defineCustomFunction(String definition) {
     String[] tokens = definition.trim().split(" ");
-    if (tokens[0].equals("e")) {
-      customFunctions.put(tokens[0], ctx -> parse(tokens[1]));
-    } else {
-      // "2 *"
-      customFunctions.put(tokens[0], ctx -> {
-        var value = parse(tokens[1]);
-        ctx.stack.push(value);
-        var f = function(tokens[2]);
-        return f.apply(ctx);
-      });
-    }
+    customFunctions.put(tokens[0], ctx -> eval(ctx, Arrays.copyOfRange(tokens, 1, tokens.length)));
   }
 
   private BigDecimal parse(String string) {
