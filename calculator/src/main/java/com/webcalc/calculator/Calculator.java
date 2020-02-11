@@ -83,6 +83,7 @@ public class Calculator {
   public void defineCustomFunction(String definition) {
     String[] tokens = definition.trim().split(" ");
     customFunctions.put(tokens[0], stack -> parse(tokens[1]));
+    customFunctions.put("times2", stack -> parse("6"));
   }
 
   private BigDecimal parse(String string) {

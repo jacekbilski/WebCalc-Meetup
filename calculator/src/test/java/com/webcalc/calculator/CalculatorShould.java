@@ -123,6 +123,7 @@ class CalculatorShould {
   @ParameterizedTest(name = "function: ''{0}'', input: ''{1}'', max fraction digits: ''{3}'', expected result: ''{2}''")
   @CsvSource({
       "'e 2,7182818284590452354', e, '2,718282', 6",
+      "times2 2 *, 3 times2, 6, 0",
   })
   void supportDefiningAndEvaluatingCustomFunctions(String definition, String input, String expectedResult, int maxFractionDigits) {
     calculator.defineCustomFunction(definition);
