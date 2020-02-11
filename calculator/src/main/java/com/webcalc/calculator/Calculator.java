@@ -18,6 +18,8 @@ public class Calculator {
 
   private CalculatorObserver observer;
 
+  private Function<Stack<BigDecimal>, BigDecimal> customFunction;
+
   public Calculator() {
     formatter = DecimalFormat.getNumberInstance(Locale.GERMANY);
     if (formatter instanceof DecimalFormat)
@@ -69,10 +71,14 @@ public class Calculator {
       case "π":
         return stack -> BigDecimal.valueOf(Math.PI);
       case "e":
-        return stack -> BigDecimal.valueOf(Math.E);
+        return customFunction;
       default:
         throw new RuntimeException("Unsupported function: " + function);
     }
+  }
+
+  public void defineCustomFunction(String definition) {
+    customFunction = stack -> BigDecimal.valueOf(Math.E);
   }
 
   private BigDecimal parse(String string) {

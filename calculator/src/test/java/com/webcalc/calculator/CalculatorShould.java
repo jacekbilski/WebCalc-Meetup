@@ -100,7 +100,7 @@ class CalculatorShould {
   @CsvSource({
       "π, '3,14159', 5",
   })
-  void constants(String input, String expectedResult, int maxFractionDigits) {
+  void supportConstants(String input, String expectedResult, int maxFractionDigits) {
     String result = calculator.eval(userId, input, maxFractionDigits);
     assertThat(result).isEqualTo(expectedResult);
   }
@@ -114,8 +114,19 @@ class CalculatorShould {
       "1 2 3 4 5 * * * *, 120",
       "1 2 + 3 *, 9",
   })
-  void complexCalculations(String input, String expectedResult) {
+  void supportComplexCalculations(String input, String expectedResult) {
     String result = calculator.eval(userId, input, Calculator.DEFAULT_MAX_FRACTION_DIGITS);
+    assertThat(result).isEqualTo(expectedResult);
+  }
+
+  @DisplayName("Custom functions")
+  @ParameterizedTest(name = "function: ''{0}'', input: ''{1}'', max fraction digits: ''{3}'', expected result: ''{2}''")
+  @CsvSource({
+      "'e 2,7182818284590452354', e, '2,718282', 6",
+  })
+  void supportDefiningAndEvaluatingCustomFunctions(String definition, String input, String expectedResult, int maxFractionDigits) {
+    calculator.defineCustomFunction(definition);
+    String result = calculator.eval(userId, input, maxFractionDigits);
     assertThat(result).isEqualTo(expectedResult);
   }
 }
